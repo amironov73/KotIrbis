@@ -1,18 +1,19 @@
 package arsmagna
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 
 class SubFieldTest {
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun testConstructor_1() {
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun testClone() {
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun testToString() {
     }
 }
