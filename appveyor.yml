@@ -1,0 +1,19 @@
+version: 1.0.{build}
+image: Visual Studio 2019
+
+clone_folder: c:\projects\kotirbis
+
+build_script:
+- cmd: >-
+    cd c:\projects\kotirbis
+
+    mvn --version
+
+    mvn package
+
+
+artifacts:
+- path: target\*.jar
+  name: JAR
+
+test: off
