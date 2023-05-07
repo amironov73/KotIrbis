@@ -4,12 +4,7 @@ package arsmagna
  * Поле библиографической записи.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class Field(var tag: Int = 0, var value: String? = null) {
-    /**
-     * Нет метки, т. е. метка ещё не установлена.
-     */
-    val NO_TAG = 0
-
+class Field(var tag: Int = NO_TAG, var value: String? = null) {
     /**
      * Список подполей.
      */
