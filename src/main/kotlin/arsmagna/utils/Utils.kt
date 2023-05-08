@@ -3,7 +3,7 @@
 package arsmagna.utils
 
 /*
- * Вспомогательные методы, не вошедшие в прочие классы.
+ * Вспомогательные константы и методы, не вошедшие в прочие классы.
  */
 
 import org.jetbrains.annotations.Contract
@@ -47,6 +47,95 @@ val READ_RECORD_CODES = intArrayOf(-201, -600, -602, -603)
  * Return codes that are valid for the ReadTerms command.
  */
 val READ_TERMS_CODES = intArrayOf(-202, -203, -204)
+
+// КОДЫ АРМ
+
+/**
+ * АРМ "Администратор".
+ */
+const val Administrator: Byte =  65 // 'A'
+
+/**
+ * АРМ "Книговыдача".
+ */
+const val Bookland: Byte = 66 // 'B'
+
+/**
+ * АРМ "Книговыдача". Еще разок :)
+ */
+const val Circulation: Byte = 66 // 'B'
+
+/**
+ * АРМ "Каталогизатор".
+ */
+const val Cataloger: Byte = 67 // 'C'
+
+/**
+ * Апплет Java.
+ */
+const val JavaAppllet: Byte = 74 // 'J'
+
+/**
+ * АРМ "Книгообеспеченность".
+ */
+const val Provision: Byte = 75 // 'K'
+
+/**
+ * АРМ "Комплектатор".
+ */
+const val Acquisitions: Byte = 77 // 'M'
+
+/**
+ * АРМ "Читатель".
+ */
+const val Reader: Byte = 82 // 'R'
+
+// СТАТУСЫ ЗАПИСЕЙ
+
+/**
+ * Нет статуса записи (все нули).
+ */
+const val NO_STATUS = 0
+
+/**
+ * Запись логически удалена.
+ */
+const val LOGICALLY_DELETED = 1
+
+/**
+ * Запись физически удалена.
+ */
+const val PHYSICALLY_DELETED = 2
+
+/**
+ * Запись отсутствует.
+ */
+const val ABSENT = 4
+
+/**
+ * Запись не актуализирована.
+ */
+const val NON_ACTUALIZED = 8
+
+/**
+ * Последняя версия записи.
+ */
+const val LAST_VERSION = 32
+
+/**
+ * Запись заблокирована.
+ */
+const val LOCKED = 64
+
+/**
+ * Ошибка в Autoin.gbl.
+ */
+const val AutoinError = 128
+
+/**
+ * Полный текст не актуализирован.
+ */
+const val FullTextNotActualized = 256
 
 // ОТДЕЛЬНЫЕ СИМВОЛЫ
 /**
