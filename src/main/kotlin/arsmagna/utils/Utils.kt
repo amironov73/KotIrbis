@@ -48,6 +48,78 @@ val READ_RECORD_CODES = intArrayOf(-201, -600, -602, -603)
  */
 val READ_TERMS_CODES = intArrayOf(-202, -203, -204)
 
+// ОБЩИЕ РАЗДЕЛИТЕЛИ
+
+/**
+ * Запятая.
+ */
+val comma = charArrayOf(',')
+
+/**
+ * Запятая или точка с запятой.
+ */
+val commaOrSemicolon = charArrayOf(',', ';')
+
+/**
+ * Двоеточие.
+ */
+val colon = charArrayOf(':')
+
+/**
+ * Точка.
+ */
+val dot = charArrayOf('.')
+
+/**
+ * Знак "минус".
+ */
+val minus = charArrayOf('-')
+
+/**
+ * Перевод строки.
+ */
+val newLine = charArrayOf('\r', '\n')
+
+/**
+ * Перевод строки или символ процента.
+ */
+val newLineOrPercent = charArrayOf('\r', '\n', '%')
+
+/**
+ * Решетка.
+ */
+val numberSign = charArrayOf('#')
+
+/**
+ * Точка с запятой.
+ */
+val semicolon = charArrayOf(';')
+
+/**
+ * Слэш.
+ */
+val slash = charArrayOf('/')
+
+/**
+ * Пробел.
+ */
+val space = charArrayOf(' ')
+
+/**
+ * Пробел или символ табуляции.
+ */
+val spaceOrTab = charArrayOf(' ', '\t')
+
+/**
+ * Символ табуляции.
+ */
+val tab = charArrayOf('\t')
+
+/**
+ * Вертикальная черта.
+ */
+val verticalLine = charArrayOf('|')
+
 // КОДЫ АРМ
 
 /**
