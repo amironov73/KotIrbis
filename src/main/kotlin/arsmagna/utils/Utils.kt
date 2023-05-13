@@ -6,7 +6,9 @@ package arsmagna.utils
  * Вспомогательные константы и методы, не вошедшие в прочие классы.
  */
 
+import arsmagna.SubField
 import org.jetbrains.annotations.Contract
+
 
 /**
  * Максимальное количество записей в пакете.
@@ -346,4 +348,44 @@ fun nullableToString(value: Any?): String? {
 
 fun toVisible(value: Any?): String {
     return value?.toString() ?: "(null)"
+}
+
+/**
+ * Сравнение подполей для сортировки.
+ *
+ * @param subField1 Первое подполе.
+ * @param subField2 Второе подполе.
+ * @return Результат сравнения.
+ */
+@Contract(pure = true)
+fun compareSubFields(subField1: SubField, subField2: SubField): Int {
+    var result = compareCodes(subField1.code, subField2.code)
+    if (result != 0) {
+        return result
+    }
+    result = subField1.value!!.compareTo(subField2.value!!)
+    return result
+}
+
+/**
+ * Сравнение кодов подполей.
+ *
+ * @param code1 Первый код.
+ * @param code2 Второй код.
+ * @return Результат сравнения.
+ */
+@Contract(pure = true)
+fun compareCodes(code1: Char, code2: Char): Int {
+    return Character.compare(normalizeCode(code1), normalizeCode(code2))
+}
+
+/**
+ * Нормализация кода подполя.
+ *
+ * @param code Исходный код.
+ * @return Нормализованный код.
+ */
+@Contract(pure = true)
+fun normalizeCode(code: Char): Char {
+    return code.lowercaseChar()
 }

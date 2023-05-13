@@ -1,7 +1,12 @@
 package arsmagna
 
+import arsmagna.utils.LOGICALLY_DELETED
+import arsmagna.utils.PHYSICALLY_DELETED
 import arsmagna.utils.isNullOrEmpty
 import arsmagna.utils.nullableToString
+import org.jetbrains.annotations.Contract
+import java.util.*
+
 
 /**
  * Библиографическая запись.
@@ -96,6 +101,91 @@ class Record {
 
         return result
     }
+
+    @Contract(pure = true)
+    fun fm(tag: Int): String? {
+        for (field in fields) {
+            if (field.tag == tag) {
+                return field.value
+            }
+        }
+        return null
+    }
+
+    @Contract(pure = true)
+    fun fm(tag: Int, code: Char): String? {
+        for (field in fields) {
+            if (field.tag == tag) {
+                return field.getFirstSubFieldValue(code)
+            }
+        }
+        return null
+    }
+
+    fun fma(tag: Int): Array<String> {
+        val result = LinkedList<String>()
+        for (field in fields) {
+            if (field.tag == tag) {
+                val fieldValue = field.value
+                if (fieldValue != null) {
+                    result.add(fieldValue)
+                }
+            }
+        }
+        return result.toTypedArray<String>()
+    }
+
+    fun fma(tag: Int, code: Char): Array<String> {
+        val result = LinkedList<String>()
+        for (field in fields) {
+            if (field.tag == tag) {
+                val text = field.getFirstSubFieldValue(code)
+                if (text != null) {
+                    result.add(text)
+                }
+            }
+        }
+        return result.toTypedArray<String>()
+    }
+
+    fun getField(tag: Int): Array<Field?> {
+        val result: LinkedList<Field> = LinkedList<Field>()
+        for (field in fields) {
+            if (field.tag == tag) {
+                result.add(field)
+            }
+        }
+        return result.toArray(arrayOfNulls<Field>(0))
+    }
+
+    @Contract(pure = true)
+    fun getField(tag: Int, occurrence: Int): Field? {
+        var occ = occurrence
+        for (field in fields) {
+            if (field.tag == tag && --occ < 0) {
+                return field
+            }
+        }
+        return null
+    }
+
+    @Contract(pure = true)
+    fun getFirstField(tag: Int): Field? {
+        for (field in fields) {
+            if (field.tag == tag) {
+                return field
+            }
+        }
+        return null
+    }
+
+    /**
+     * Удалена ли запись?
+     *
+     * @return true, если запись удалена.
+     */
+    @Contract(pure = true)
+    fun isDeleted(): Boolean = status and (LOGICALLY_DELETED or PHYSICALLY_DELETED) != 0
 
     override fun toString(): String {
         return StringBuilder().apply {
