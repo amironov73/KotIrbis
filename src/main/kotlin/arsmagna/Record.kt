@@ -1,10 +1,8 @@
 package arsmagna
 
-import arsmagna.utils.LOGICALLY_DELETED
-import arsmagna.utils.PHYSICALLY_DELETED
-import arsmagna.utils.isNullOrEmpty
-import arsmagna.utils.nullableToString
+import arsmagna.utils.*
 import org.jetbrains.annotations.Contract
+import java.io.IOException
 import java.util.*
 
 
@@ -186,6 +184,36 @@ class Record {
      */
     @Contract(pure = true)
     fun isDeleted(): Boolean = status and (LOGICALLY_DELETED or PHYSICALLY_DELETED) != 0
+
+    /**
+     * Разбор строк, возвращаемых сервером.
+     *
+     * @param text Строки, содержащие запись.
+     * @throws IOException Ошибка ввода-вывода.
+     */
+    @Throws(IOException::class)
+    fun parseSingle(text: Array<String>) {
+        if (text.isEmpty()) {
+            return
+        }
+
+        var line = text[0]
+        var parts = line.split("#".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        mfn = fastParseInt(parts[0])
+        if (parts.size != 1) {
+            status = fastParseInt(parts[1])
+        }
+
+        line = text[1]
+        parts = line.split("#".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        version = fastParseInt(parts[1])
+        fields.clear()
+        for (i in 2 until text.size) {
+            val field = Field()
+            field.parse(text[i])
+            fields.add(field)
+        }
+    }
 
     override fun toString(): String {
         return StringBuilder().apply {

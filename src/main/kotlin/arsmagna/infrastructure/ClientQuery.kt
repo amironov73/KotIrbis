@@ -1,18 +1,20 @@
 package arsmagna.infrastructure
 
-import arsmagna.IrbisConnection
+import arsmagna.Connection
+import arsmagna.utils.LF
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-
 
 /**
  * Клиентский запрос.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class ClientQuery (connection: IrbisConnection, commandCode: String) {
-    private val stream: ByteArrayOutputStream = ByteArrayOutputStream()
+class ClientQuery (connection: Connection, commandCode: String) {
+    @Suppress("JoinDeclarationAndAssignment")
+    private val stream: ByteArrayOutputStream
 
     init {
+        stream = ByteArrayOutputStream()
         addAnsi(commandCode)
         addAnsi(Character.valueOf(connection.workstation).toString())
         addAnsi(commandCode)
@@ -26,57 +28,70 @@ class ClientQuery (connection: IrbisConnection, commandCode: String) {
         addLineFeed()
     }
 
-    //=========================================================================
+    /**
+     * Добавление логического значения.
+     */
     @Throws(IOException::class)
     fun add(value: Boolean) {
         val text = if (value) "1" else "0"
         addAnsi(text)
     }
 
+    /**
+     * Добавление целого числа.
+     */
     @Throws(IOException::class)
     fun add(value: Int) {
         val text = value.toString()
         addAnsi(text)
     }
 
+    /**
+     * Добавление строки в кодировке ANSI с переходом на новую строку.
+     */
     @Throws(IOException::class)
     fun addAnsi(text: String?) {
         addAnsiNoLF(text)
         addLineFeed()
     }
 
-    @Suppress("UNUSED_PARAMETER")
+    /**
+     * Добавление строки в кодировке ANSI без перехода на новую строку.
+     */
     @Throws(IOException::class)
     fun addAnsiNoLF(text: String?) {
-        TODO()
-//        if (!isNullOrEmpty(text)) {
-//            val bytes: ByteArray = text.getBytes(IrbisEncoding.ansi())
-//            stream!!.write(bytes)
-//        }
+        if (text != null) {
+            val bytes = text.toByteArray(getAnsiEncoding())
+            stream.write(bytes)
+        }
     }
 
+    /**
+     * Переход на новую строку.
+     */
     @Throws(IOException::class)
     fun addLineFeed() {
-        TODO()
-        // stream.write(Utility.LF)
+        stream.write(LF)
     }
 
-    @Suppress("UNUSED_PARAMETER")
+    /**
+     * Добавление строки в кодировке UTF-8 с переходом на новую строку.
+     */
     @Throws(IOException::class)
     fun addUtf(text: String?) {
-        TODO()
-//        if (!isNullOrEmpty(text)) {
-//            val bytes: ByteArray = text.getBytes(IrbisEncoding.utf())
-//            stream!!.write(bytes)
-//        }
-//        addLineFeed()
+        if (text != null) {
+            val bytes = text.toByteArray(getUtfEncoding())
+            stream.write(bytes)
+        }
+        addLineFeed()
     }
 
+    /**
+     * Сериализация запроса в последовательность байт.
+     */
     fun encode(): Array<ByteArray> {
-        TODO()
-//        val buffer = stream!!.toByteArray()
-//        val prefix: ByteArray = IrbisEncoding.ansi().encode(buffer.size.toString() + "\n").array()
-//        return arrayOf(prefix, buffer)
+        val buffer = stream.toByteArray()
+        val prefix: ByteArray = getAnsiEncoding().encode(buffer.size.toString() + "\n").array()
+        return arrayOf(prefix, buffer)
     }
-
 }

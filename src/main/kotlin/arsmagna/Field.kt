@@ -3,6 +3,8 @@ package arsmagna
 import arsmagna.utils.compareCodes
 import arsmagna.utils.nullableToString
 import org.jetbrains.annotations.Contract
+import java.io.IOException
+import java.io.StringReader
 import java.util.*
 
 
@@ -137,6 +139,61 @@ class Field(var tag: Int = NO_TAG, var value: String? = null) {
             }
         }
         return null
+    }
+
+    /**
+     * Разбор строки.
+     *
+     * @param line Text to parse.
+     * @return Parsed field.
+     * @throws IOException Error during input-output.
+     */
+    @Throws(IOException::class)
+    fun parse(line: String) {
+        TODO()
+//        val reader = StringReader(line)
+//        val tagText: String = Utility.readTo(reader, '#')
+//        val tag: Int = FastNumber.parseInt32(tagText)
+//        val result = RecordField(tag)
+//        result.value = Utility.readTo(reader, '^')
+//        while (true) {
+//            val next = reader.read()
+//            if (next < 0) {
+//                break
+//            }
+//            val code = next.toChar().lowercaseChar()
+//            val value: String = Utility.readTo(reader, '^')
+//            val subField = SubField(code, value)
+//            result.subFields.add(subField)
+//        }
+//        return result
+    }
+
+    /**
+     * Разбор строки.
+     *
+     * @param tag Field tag
+     * @param line Text to parse
+     * @return Parsed field
+     * @throws IOException Error during input-output
+     */
+    @Throws(IOException::class)
+    fun parse(tag: Int, line: String) {
+        TODO()
+//        val reader = StringReader(line)
+//        val result = Field(tag)
+//        result.value = Utility.readTo(reader, '^')
+//        while (true) {
+//            val next = reader.read()
+//            if (next < 0) {
+//                break
+//            }
+//            val code = next.toChar().lowercaseChar()
+//            val value: String = Utility.readTo(reader, '^')
+//            val subField = SubField(code, value)
+//            result.subFields.add(subField)
+//        }
+//        return result
     }
 
     override fun toString(): String {

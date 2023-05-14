@@ -17,7 +17,7 @@ import java.util.*
  * Подключение к серверу ИРБИС64.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class IrbisConnection {
+class Connection {
     /**
      * Адрес сервера.
      */
@@ -143,7 +143,7 @@ class IrbisConnection {
     }
 
     /**
-     * Создание словаря в базе данных.
+     * Создание словаря в указанной базе данных.
      *
      * @param databaseName Имя базы данных.
      * @throws IOException    Ошибка ввода-вывода.
@@ -157,7 +157,7 @@ class IrbisConnection {
     }
 
     /**
-     * Удаление базы данных.
+     * Удаление указанной базы данных.
      *
      * @param databaseName Имя удаляемой базы.
      * @throws IOException    Ошибка ввода-вывода.
@@ -262,7 +262,7 @@ class IrbisConnection {
     fun formatRecord(format: String, mfn: Int): String? {
         val query = ClientQuery(this, FORMAT_RECORD)
         query.addAnsi(database)
-        query.addAnsi(format)
+        query.addAnsi(prepareFormat(format))
         query.add(1)
         query.add(mfn)
         execute(query).use { response ->
@@ -281,15 +281,10 @@ class IrbisConnection {
      * @throws IrbisException Ошибка протокола.
      */
     @Throws(IOException::class, IrbisException::class)
-    fun formatRecord(
-        format: String,
-        record: Record
-    ): String? {
-        var format = format
-        // format = IrbisFormat.prepareFormat(format)
+    fun formatRecord(format: String, record: Record): String? {
         val query = ClientQuery(this, FORMAT_RECORD)
         query.addAnsi(database)
-        query.addAnsi(format)
+        query.addAnsi(prepareFormat(format))
         query.add(-2)
         query.addUtf(record.toString())
         execute(query).use { response ->
@@ -300,14 +295,12 @@ class IrbisConnection {
 
     @Throws(IOException::class, IrbisException::class)
     fun formatRecords(format: String, mfns: IntArray): Array<String>? {
-        var format = format
         if (mfns.size == 0) {
             return arrayOf()
         }
-        // format = IrbisFormat.prepareFormat(format)
         val query = ClientQuery(this, FORMAT_RECORD)
         query.addAnsi(database)
-        query.addAnsi(format)
+        query.addAnsi(prepareFormat(format))
         query.add(mfns.size)
         for (i in mfns.indices) {
             query.add(mfns[i])
@@ -578,17 +571,20 @@ class IrbisConnection {
      */
     @Throws(IrbisException::class)
     fun parseConnectionString(connectionString: String) {
-        val items = connectionString.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val items = connectionString.split(";".toRegex())
+            .dropLastWhile { it.isEmpty() }.toTypedArray()
         for (item in items) {
             val parts = item.split("=".toRegex(), limit = 2).toTypedArray()
             if (parts.size != 2) {
                 throw IrbisException()
             }
+
             val name = parts[0].trim { it <= ' ' }.lowercase(Locale.getDefault())
             val value = parts[1].trim { it <= ' ' }
             if (isNullOrEmpty(name) || isNullOrEmpty(value)) {
                 throw IrbisException()
             }
+
             when (name) {
                 "host", "server", "address" -> host = value
                 "port" -> port = value.toInt()
@@ -609,7 +605,7 @@ class IrbisConnection {
      *
      * @return Прошлая база данных.
      */
-    fun popDatabase(): String? {
+    fun popDatabase(): String {
         val result = database
         database = _databaseStack.pop()
         return result
@@ -644,7 +640,7 @@ class IrbisConnection {
      * @param newDatabase Новая база данных.
      * @return Предыдущая база данных.
      */
-    fun pushDatabase(newDatabase: String): String? {
+    fun pushDatabase(newDatabase: String): String {
         val result = database
         _databaseStack.push(database)
         database = newDatabase
@@ -792,12 +788,11 @@ class IrbisConnection {
         query.addAnsi(databaseName)
         query.add(mfn)
         execute(query).use { response ->
-            TODO()
-//            response.checkReturnCode(Utility.READ_RECORD_CODES)
-//            val lines = response.readRemainingUtfLines()
-//            val result = MarcRecord()
-//            result.parseSingle(lines)
-//            return result
+            response.checkReturnCode(READ_RECORD_CODES)
+            val lines = response.readRemainingUtfLines()
+            val result = Record()
+            result.parseSingle(lines)
+            return result
         }
     }
 
@@ -813,8 +808,7 @@ class IrbisConnection {
      */
     @Throws(IOException::class, IrbisException::class)
     fun readRecord(
-        databaseName: String, mfn: Int,
-        versionNumber: Int
+        databaseName: String, mfn: Int, versionNumber: Int
     ): Record? {
         val query = ClientQuery(this, READ_RECORD)
         query.addAnsi(databaseName)
@@ -1123,13 +1117,7 @@ class IrbisConnection {
      */
     @Contract(pure = true)
     fun toConnectionString(): String {
-        return ("host=" + host
-                + ";port=" + port
-                + ";username=" + username
-                + ";password=" + password
-                + ";database" + database
-                + ";arm=" + workstation
-                + ";")
+        return ("host=" + host + ";port=" + port + ";username=" + username + ";password=" + password + ";database" + database + ";arm=" + workstation + ";")
     }
 
     /**
@@ -1163,8 +1151,7 @@ class IrbisConnection {
      */
     @Throws(IOException::class)
     fun unlockRecords(
-        databaseName: String,
-        vararg mfnList: Int
+        databaseName: String, vararg mfnList: Int
     ) {
         if (mfnList.size == 0) {
             return
@@ -1237,8 +1224,7 @@ class IrbisConnection {
      */
     @Throws(IOException::class, IrbisException::class)
     fun writeRecord(
-        record: Record, lockFlag: Boolean,
-        actualize: Boolean, dontParseResponse: Boolean
+        record: Record, lockFlag: Boolean, actualize: Boolean, dontParseResponse: Boolean
     ): Int {
         val databaseName: String = iif(record.database, database) ?: throw IllegalArgumentException()
         val query = ClientQuery(this, UPDATE_RECORD)
@@ -1277,8 +1263,7 @@ class IrbisConnection {
      */
     @Throws(IOException::class, IrbisException::class)
     fun writeRecords(
-        records: Array<Record>, lockFlag: Boolean,
-        actualize: Boolean, dontParseResponse: Boolean
+        records: Array<Record>, lockFlag: Boolean, actualize: Boolean, dontParseResponse: Boolean
     ): Int {
         if (records.size == 0) {
             return getMaxMfn(database)
@@ -1290,9 +1275,7 @@ class IrbisConnection {
         query.add(lockFlag)
         query.add(actualize)
         for (record in records) {
-            val line: String = (iif(record.database, database)
-                    + IRBIS_DELIMITER
-                    + record.toString())
+            val line: String = (iif(record.database, database) + IRBIS_DELIMITER + record.toString())
             query.addUtf(line)
         }
         execute(query).use { response ->

@@ -1,8 +1,8 @@
-import arsmagna.IrbisConnection
+import arsmagna.Connection
 import java.util.Arrays
 
 fun main() {
-    val connection = IrbisConnection().apply {
+    val connection = Connection().apply {
         host = "192.168.1.1"
         username = "librarian"
         password = "secret"
