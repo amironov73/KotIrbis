@@ -9,7 +9,7 @@ KotIrbis currently supports JDK 11.
 ### Example code
 
 ```kotlin
-import arsmagna.IrbisConnection
+import arsmagna.Connection
 import java.util.Arrays
 
 fun main() {

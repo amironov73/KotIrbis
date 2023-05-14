@@ -508,50 +508,56 @@ class Connection {
         return result.toTypedArray<String?>()
     }
 
-//    /**
-//     * Получение списка серверных процессов.
-//     *
-//     * @return Массив процессов.
-//     * @throws IOException    Ошибка ввода-вывода.
-//     * @throws IrbisException Ошибка протокола.
-//     */
-//    @Throws(IOException::class, IrbisException::class)
-//    fun listProcesses(): Array<IrbisProcessInfo?> {
-//        val query = ClientQuery(this, GET_PROCESS_LIST)
-//        execute(query).use { response ->
-//            response.checkReturnCode()
-//            return IrbisProcessInfo.parse(response)
-//        }
-//    }
+    /**
+     * Получение списка серверных процессов.
+     *
+     * @return Массив процессов.
+     * @throws IOException    Ошибка ввода-вывода.
+     * @throws IrbisException Ошибка протокола.
+     */
+    @Throws(IOException::class, IrbisException::class)
+    fun listProcesses(): Array<ProcessInfo> {
+        val query = ClientQuery(this, GET_PROCESS_LIST)
+        execute(query).use { response ->
+            response.checkReturnCode()
+            return ProcessInfo.parse(response)
+        }
+    }
 
-//    /**
-//     * Мониторинг (ждем окончания указанной операции).
-//     *
-//     * @param operation Какую операцию ждем
-//     * @return Серверный лог-файл (результат выполнения операции)
-//     */
-//    @Throws(IOException::class, IrbisException::class, InterruptedException::class)
-//    fun monitorOperation(operation: String): String? {
-//        val clientId = Integer.toString(clientId)
-//        while (true) {
-//            var found = false
-//            val processes: Array<IrbisProcessInfo?> = listProcesses()
-//            for (process in processes) {
-//                if (clientId.compareTo(process.clientId) == 0
-//                    && operation.compareTo(process.lastCommand) == 0
-//                ) {
-//                    found = true
-//                }
-//            }
-//            if (!found) {
-//                break
-//            }
-//            Thread.sleep(1000)
-//        }
-//        val filename = "$clientId.ibf"
-//        val specification = FileSpecification(IrbisPath.SYSTEM, null, filename)
-//        return readTextContent(specification)
-//    }
+    /**
+     * Мониторинг (ждем окончания указанной операции).
+     *
+     * @param operation Какую операцию ждем
+     * @return Серверный лог-файл (результат выполнения операции)
+     */
+    @Throws(IOException::class, IrbisException::class, InterruptedException::class)
+    fun monitorOperation(operation: String): String? {
+        val clientId = Integer.toString(clientId)
+        while (true) {
+            var found = false
+            for (process in listProcesses()) {
+                val processClientId = process.clientId
+                val lastCommand = process.lastCommand
+                if (processClientId != null && lastCommand != null
+                    && clientId.compareTo(processClientId) == 0
+                    && operation.compareTo(lastCommand) == 0
+                ) {
+                    found = true
+                    break
+                }
+            }
+
+            if (!found) {
+                break
+            }
+
+            Thread.sleep(1000)
+        }
+
+        val filename = "$clientId.ibf"
+        val specification = FileSpecification(IrbisPath.SYSTEM, filename)
+        return readTextContent(specification)
+    }
 
     /**
      * Пустая операция (используется для периодического подтверждения подключения клиента).

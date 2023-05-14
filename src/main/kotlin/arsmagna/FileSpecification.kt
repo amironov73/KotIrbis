@@ -40,6 +40,11 @@ class FileSpecification {
         this.fileName = fileName
     }
 
+    constructor(path: IrbisPath, fileName: String) {
+        this.path = path.path
+        this.fileName = fileName
+    }
+
     constructor(path: Int, fileName: String) {
         this.path = path
         this.fileName = fileName
