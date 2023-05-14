@@ -401,21 +401,21 @@ class Connection {
 //        }
 //    }
 
-//    /**
-//     * Получение списка пользователей с сервера.
-//     *
-//     * @return Массив пользователей.
-//     * @throws IOException    Ошибка ввода-вывода.
-//     * @throws IrbisException Ошибка протокола.
-//     */
-//    @Throws(IOException::class, IrbisException::class)
-//    fun getUserList(): Array<UserInfo?>? {
-//        val query = ClientQuery(this, GET_USER_LIST)
-//        execute(query).use { response ->
-//            response.checkReturnCode()
-//            return UserInfo.parse(response)
-//        }
-//    }
+    /**
+     * Получение списка пользователей с сервера.
+     *
+     * @return Массив пользователей.
+     * @throws IOException    Ошибка ввода-вывода.
+     * @throws IrbisException Ошибка протокола.
+     */
+    @Throws(IOException::class, IrbisException::class)
+    fun getUserList(): Array<UserInfo> {
+        val query = ClientQuery(this, GET_USER_LIST)
+        execute(query).use { response ->
+            response.checkReturnCode()
+            return UserInfo.parse(response)
+        }
+    }
 
     /**
      * Подключен ли клиент в данный момент?
@@ -1122,9 +1122,9 @@ class Connection {
      * @return Строка подключения.
      */
     @Contract(pure = true)
-    fun toConnectionString(): String {
-        return ("host=" + host + ";port=" + port + ";username=" + username + ";password=" + password + ";database" + database + ";arm=" + workstation + ";")
-    }
+    fun toConnectionString() = "host=" + host + ";port=" + port +
+            ";username=" + username + ";password=" + password +
+            ";database" + database + ";arm=" + workstation + ";"
 
     /**
      * Опустошение базы данных.
@@ -1157,16 +1157,19 @@ class Connection {
      */
     @Throws(IOException::class)
     fun unlockRecords(
-        databaseName: String, vararg mfnList: Int
+        databaseName: String,
+        vararg mfnList: Int
     ) {
-        if (mfnList.size == 0) {
+        if (mfnList.isEmpty()) {
             return
         }
+
         val query = ClientQuery(this, UNLOCK_RECORDS)
         query.addAnsi(databaseName)
         for (mfn in mfnList) {
             query.add(mfn)
         }
+
         executeAndForget(query)
     }
 
@@ -1178,31 +1181,32 @@ class Connection {
      */
     @Throws(IOException::class)
     fun updateIniFile(lines: Array<String?>) {
-        if (lines.size == 0) {
+        if (lines.isEmpty()) {
             return
         }
         val query = ClientQuery(this, UPDATE_INI_FILE)
         for (line in lines) {
             query.addAnsi(line)
         }
+
         executeAndForget(query)
     }
 
-//    /**
-//     * Обновление списка пользователей на сервере.
-//     *
-//     * @param userList Список пользователей.
-//     * @throws IOException Ошибка ввода-вывода.
-//     */
-//    @Throws(IOException::class)
-//    fun updateUserList(userList: Array<UserInfo?>) {
-//        val query = ClientQuery(this, SET_USER_LIST)
-//        for (user in userList) {
-//            val line: String = user.encode()
-//            query.addAnsi(line)
-//        }
-//        executeAndForget(query)
-//    }
+    /**
+     * Обновление списка пользователей на сервере.
+     *
+     * @param userList Список пользователей.
+     * @throws IOException Ошибка ввода-вывода.
+     */
+    @Throws(IOException::class)
+    fun updateUserList(userList: Array<UserInfo>) {
+        val query = ClientQuery(this, SET_USER_LIST)
+        for (user in userList) {
+            query.addAnsi(user.encode())
+        }
+
+        executeAndForget(query)
+    }
 
     /**
      * Сохранение записи на сервере.
