@@ -1024,6 +1024,7 @@ class Connection {
         if (isNullOrEmpty(result)) {
             throw IrbisFileNotFoundException(specification)
         }
+
         return result
     }
 
@@ -1033,9 +1034,8 @@ class Connection {
      * @throws IOException Ошибка ввода-вывода.
      */
     @Throws(IOException::class)
-    fun restartServer() {
-        executeAnsi(RESTART_SERVER)
-    }
+    fun restartServer() = executeAnsi(RESTART_SERVER)
+
 
     /**
      * Поиск записей.
